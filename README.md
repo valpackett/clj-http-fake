@@ -1,10 +1,19 @@
 # clj-http-fake
 
-FIXME: write description
+Basically, [fakeweb](https://github.com/chrisk/fakeweb) in Clojure, for [clj-http](https://github.com/dakrone/clj-http).
 
 ## Usage
 
-FIXME: write
+```clojure
+(ns myapp.test.core
+  (:require [clj-http.client :as c])
+  (:use clj-http.fake))
+
+(with-fake-routes
+  ; also supports regexps
+  {"http://google.com/" (fn [req] {:status 200 :headers {} :body "HACKED LOL HAHA"})}
+  (c/get "http://google.com/"))
+```
 
 ## License
 
