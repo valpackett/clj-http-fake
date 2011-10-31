@@ -31,10 +31,8 @@
     (boolean (re-matches route uri))))
 
 (add-hook #'clj-http.core/request
-  (fn [origfn & args]
-    (let [req (first args)
-          route (val (first (filter #(matches (key %) req) *fake-routes*)))]
-      (if route
-        (let [resp (route (assoc req :scheme (symbol (:scheme req))))]
-          (assoc resp :body (utf8-bytes (:body resp))))
-        (origfn req)))))
+  (fn [origfn req]
+    (if-let [route (val (first (filter #(matches (key %) req) *fake-routes*)))]
+      (let [resp (route (assoc req :scheme (symbol (:scheme req))))]
+        (assoc resp :body (utf8-bytes (:body resp))))
+      (origfn req))))
