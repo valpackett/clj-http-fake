@@ -1,4 +1,4 @@
-# clj-http-fake
+# clj-http-fake [![Maintained Status](http://stillmaintained.com/myfreeweb/clj-http-fake.png)](http://stillmaintained.com/myfreeweb/clj-http-fake)
 
 Basically, [fakeweb](https://github.com/chrisk/fakeweb) in Clojure, for [clj-http](https://github.com/dakrone/clj-http).
 
