@@ -1,8 +1,11 @@
 (ns clj-http.test.fake
-  (:require [clj-http.client :as c])
-  (:use clj-http.fake, clojure.test :reload-all))
+  (:require [clj-http.client :as http])
+  (:use [clj-http.fake]
+        [clojure.test]))
 
-(deftest t-fake
+(deftest test-executes-fake-with-single-route
   (is (= (with-fake-routes
-            {"http://floatboth.com/" (fn [req] {:status 200 :headers {} :body "hi"})}
-            (:body (c/get "http://floatboth.com/"))) "hi")))
+           {"http://floatboth.com/"
+            (fn [req]
+              {:status 200 :headers {} :body "hi"})}
+           (:body (http/get "http://floatboth.com/"))) "hi")))
