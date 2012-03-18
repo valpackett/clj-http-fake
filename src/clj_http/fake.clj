@@ -1,6 +1,7 @@
 (ns clj-http.fake
-  (:use (clj-http core util),
-        robert.hooke))
+  (:require [clj-http.client :as client]
+            [clj-http.util :as util])
+  (:use [robert.hooke]))
 
 (def ^:dynamic *fake-routes* {})
 
@@ -15,24 +16,18 @@
          ~@body))))
 
 (defn matches [route req]
-  (let [route (if (= (class route) java.util.regex.Pattern)
-                  route
-                  (if (string? route)
-                    (re-pattern
-                      (if (.startsWith route "http")
-                          route
-                          (str "http://" route)))))
-        uri (format "%s://%s%s%s%s"
-                    (name (:scheme req))
-                    (:server-name req)
-                    (if (= 80 (:server-port req)) "" (str ":" (:server-port req)))
-                    (:uri req)
-                    (or (:query-string req) ""))]
-    (boolean (re-matches route uri))))
+  (let [mapped-route (client/parse-url route)
+        requested-route (select-keys req [:scheme
+                                          :server-name
+                                          :server-port
+                                          :uri
+                                          :query-string
+                                          :user-info])]
+    (= mapped-route requested-route)))
 
 (add-hook #'clj-http.core/request
   (fn [origfn req]
     (if-let [route (val (first (filter #(matches (key %) req) *fake-routes*)))]
       (let [resp (route (assoc req :scheme (symbol (:scheme req))))]
-        (assoc resp :body (utf8-bytes (:body resp))))
+        (assoc resp :body (util/utf8-bytes (:body resp))))
       (origfn req))))

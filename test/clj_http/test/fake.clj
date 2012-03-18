@@ -3,9 +3,16 @@
   (:use [clj-http.fake]
         [clojure.test]))
 
-(deftest test-executes-fake-with-single-route
+(deftest test-executes-fake-when-matches-route-exactly
   (is (= (with-fake-routes
            {"http://floatboth.com/"
-            (fn [req]
-              {:status 200 :headers {} :body "hi"})}
-           (:body (http/get "http://floatboth.com/"))) "hi")))
+            (fn [request]
+              {:status 200 :headers {} :body "response"})}
+           (:body (http/get "http://floatboth.com/"))) "response")))
+
+(deftest test-executes-fake-when-route-contains-default-port-but-request-doesnt
+  (is (= (with-fake-routes
+           {"http://floatboth.com:80/"
+            (fn [request]
+              {:status 200 :headers {} :body "response"})}
+           (:body (http/get "http://floatboth.com/"))))))
