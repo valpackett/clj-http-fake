@@ -15,19 +15,25 @@
        (binding [*fake-routes* s#]
          ~@body))))
 
-(defn matches [route req]
-  (let [mapped-route (client/parse-url route)
-        requested-route (select-keys req [:scheme
-                                          :server-name
-                                          :server-port
-                                          :uri
-                                          :query-string
-                                          :user-info])]
-    (= mapped-route requested-route)))
+(defn matches [route request]
+  (let [mapped-route (client/parse-url route)]
+    (and
+     (= (:scheme mapped-route)        (:scheme request))
+     (= (:server-name mapped-route)   (:server-name request))
+     (if (contains? #{80 nil} (:server-port mapped-route))
+       (contains? #{80 nil} (:server-port request))
+       (= (:server-port mapped-route) (:server-port request)))
+     (= (:uri mapped-route)           (:uri request))
+     (= (:user-info mapped-route)     (:user-info request))
+     (= (:query-string mapped-route)  (:query-string request)))))
 
-(add-hook #'clj-http.core/request
-  (fn [origfn req]
-    (if-let [route (val (first (filter #(matches (key %) req) *fake-routes*)))]
-      (let [resp (route (assoc req :scheme (symbol (:scheme req))))]
-        (assoc resp :body (util/utf8-bytes (:body resp))))
-      (origfn req))))
+(defn try-intercept [origfn request]
+  (if-let [matching-route (first (filter #(matches (key %) request) *fake-routes*))]
+    (let [route-handler (val matching-route)
+          response (route-handler request)]
+      (assoc response :body (util/utf8-bytes (:body response))))
+    (origfn request)))
+
+(add-hook
+ #'clj-http.core/request
+ #'try-intercept)
