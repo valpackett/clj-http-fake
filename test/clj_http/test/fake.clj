@@ -38,3 +38,10 @@
             (fn [request]
               {:status 200 :headers {} :body "R1BWm0"})}
            (:body (http/get "http://google.com/"))) "R1BWm0")))
+
+(deftest matching-route-regular-expression
+  (is (= (with-fake-routes
+           {#"http://google.com/.*?\.html"
+            (fn [request]
+              {:status 200 :headers {} :body "UrIrHi"})}
+           (:body (http/get "http://google.com/index.html"))) "UrIrHi")))
