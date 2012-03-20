@@ -23,7 +23,9 @@
      (if (contains? #{80 nil} (:server-port mapped-route))
        (contains? #{80 nil} (:server-port request))
        (= (:server-port mapped-route) (:server-port request)))
-     (= (:uri mapped-route)           (:uri request))
+     (if (contains? #{"/" ""} (:uri mapped-route))
+       (contains? #{"/" ""} (:uri request))
+       (= (:uri mapped-route)         (:uri request)))
      (= (:user-info mapped-route)     (:user-info request))
      (= (:query-string mapped-route)  (:query-string request)))))
 
