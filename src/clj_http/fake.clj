@@ -1,6 +1,10 @@
 (ns clj-http.fake
-  (:use (clj-http core util),
-        robert.hooke))
+  (:import [java.util.regex Pattern])
+  (:require [clj-http.client :as client]
+            [clj-http.util :as util])
+  (:use [robert.hooke]
+        [clojure.math.combinatorics]
+        [clojure.string :only [join]]))
 
 (def ^:dynamic *fake-routes* {})
 
@@ -14,25 +18,53 @@
        (binding [*fake-routes* s#]
          ~@body))))
 
-(defn matches [route req]
-  (let [route (if (= (class route) java.util.regex.Pattern)
-                  route
-                  (if (string? route)
-                    (re-pattern
-                      (if (.startsWith route "http")
-                          route
-                          (str "http://" route)))))
-        uri (format "%s://%s%s%s%s"
-                    (name (:scheme req))
-                    (:server-name req)
-                    (if (= 80 (:server-port req)) "" (str ":" (:server-port req)))
-                    (:uri req)
-                    (or (:query-string req) ""))]
-    (boolean (re-matches route uri))))
+(defn- defaults-or-value [defaults value]
+  (if (contains? defaults value) (reverse (vec defaults)) (vector value)))
 
-(add-hook #'clj-http.core/request
-  (fn [origfn req]
-    (if-let [route (val (first (filter #(matches (key %) req) *fake-routes*)))]
-      (let [resp (route (assoc req :scheme (symbol (:scheme req))))]
-        (assoc resp :body (utf8-bytes (:body resp))))
-      (origfn req))))
+(defn- potential-server-ports-for [request-map]
+  (defaults-or-value #{80 nil} (:server-port request-map)))
+
+(defn- potential-uris-for [request-map]
+  (defaults-or-value #{"/" "" nil} (:uri request-map)))
+
+(defn- potential-schemes-for [request-map]
+  (defaults-or-value #{:http nil} (keyword (:scheme request-map))))
+
+(defn- potential-alternatives-to [request]
+  (let [schemes      (potential-schemes-for      request)
+        server-ports (potential-server-ports-for request)
+        uris         (potential-uris-for         request)
+        combinations (cartesian-product schemes server-ports uris)]
+    (map #(merge request (zipmap [:scheme :server-port :uri] %)) combinations)))
+
+(defn- request-string-for [request-map]
+  (let [{:keys [scheme server-name server-port uri query-string]} request-map]
+    (join [(if (nil? scheme) "" (format "%s://" (name scheme)))
+           server-name
+           (if (nil? server-port) "" (format ":%s" server-port))
+           (if (nil? uri) "" uri)
+           (if (nil? query-string) "" (format "?%s" query-string))])))
+
+(defprotocol RouteMatcher
+  (matches [route request]))
+
+(extend-protocol RouteMatcher
+  String
+  (matches [route request]
+    (matches (re-pattern (Pattern/quote route)) request))
+
+  Pattern
+  (matches [route request]
+    (let [request-strings (map request-string-for (potential-alternatives-to request))]
+      (some #(re-matches route %) request-strings))))
+
+(defn try-intercept [origfn request]
+  (if-let [matching-route (first (filter #(matches (key %) request) *fake-routes*))]
+    (let [route-handler (val matching-route)
+          response (route-handler request)]
+      (assoc response :body (util/utf8-bytes (:body response))))
+    (origfn request)))
+
+(add-hook
+ #'clj-http.core/request
+ #'try-intercept)
