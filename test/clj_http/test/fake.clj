@@ -57,6 +57,41 @@
              :handler (fn [reqeust] {:status 200 :headers {} :body "5ttguy"})}]
            (:body (http/get "http://google.com"))) "5ttguy")))
 
+(deftest matches-on-method-if-specified
+  (is (= (with-fake-routes
+           [{:method :get
+             :address "http://localhost"
+             :handler (fn [request] {:body "DCiTTN" :status 200 :headers {}})}
+            {:method :delete
+             :address "http://localhost"
+             :handler (fn [request] {:body "y4Swg8" :status 200 :headers {}})}]
+           (:body (http/delete "http://localhost"))) "y4Swg8")))
+
+(deftest matches-any-method-when-specified
+  (with-fake-routes
+    [{:method :any
+      :address "http://example.com"
+      :handler (fn [request] {:body "wp8gJf" :status 200 :headers {}})}]
+    (is (= (:body (http/get "http://example.com")) "wp8gJf"))
+    (is (= (:body (http/delete "http://example.com")) "wp8gJf"))))
+
+(deftest matches-any-method-when-no-method-specified
+  (with-fake-routes
+    [{:address "http://example.com"
+      :handler (fn [request] {:body "FyLNcb" :status 200 :headers {}})}]
+    (is (= (:body (http/get "http://example.com")) "FyLNcb"))
+    (is (= (:body (http/delete "http://example.com")) "FyLNcb"))))
+
+(deftest uses-first-matching-route-if-many-possible-matches
+  (is (= (with-fake-routes
+           [{:method :get
+             :address "http://localhost"
+             :handler (fn [request] {:body "mKmfyH" :status 200 :headers {}})}
+            {:method :get
+             :address "http://localhost"
+             :handler (fn [request] {:body "rFGWGr" :status 200 :headers {}})}]
+           (:body (http/get "http://localhost"))) "mKmfyH")))
+
 (deftest falls-through-to-real-request-method-if-no-matching-route
   (with-redefs [clj-http.core/request
                 (fn [req]
