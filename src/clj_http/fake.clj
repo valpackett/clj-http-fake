@@ -14,7 +14,8 @@
   [routes & body]
   `(do
      (let [s# ~routes]
-       (assert (map? s#))
+       (assert (vector? s#))
+       (assert (every? map? s#))
        (binding [*fake-routes* s#]
          ~@body))))
 
@@ -59,8 +60,8 @@
       (some #(re-matches route %) request-strings))))
 
 (defn try-intercept [origfn request]
-  (if-let [matching-route (first (filter #(matches (key %) request) *fake-routes*))]
-    (let [route-handler (val matching-route)
+  (if-let [matching-route (first (filter #(matches (:address %) request) *fake-routes*))]
+    (let [route-handler (:handler matching-route)
           response (route-handler request)]
       (assoc response :body (util/utf8-bytes (:body response))))
     (origfn request)))
