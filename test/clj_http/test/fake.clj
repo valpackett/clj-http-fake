@@ -49,6 +49,14 @@
               {:status 200 :headers {} :body "UrIrHi"})}
            (:body (http/get "http://google.com/index.html"))) "UrIrHi")))
 
+(deftest matches-correct-route-when-many-specified
+  (is (= (with-fake-routes
+           [{:address "http://amazon.com"
+             :handler (fn [request] {:status 200 :headers {} :body "8jLUY7"})}
+            {:address "http://google.com"
+             :handler (fn [reqeust] {:status 200 :headers {} :body "5ttguy"})}]
+           (:body (http/get "http://google.com"))) "5ttguy")))
+
 (deftest falls-through-to-real-request-method-if-no-matching-route
   (with-redefs [clj-http.core/request
                 (fn [req]
