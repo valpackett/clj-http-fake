@@ -38,7 +38,7 @@
         combinations (cartesian-product schemes server-ports uris)]
     (map #(merge request (zipmap [:scheme :server-port :uri] %)) combinations)))
 
-(defn- request-string-for [request-map]
+(defn- address-string-for [request-map]
   (let [{:keys [scheme server-name server-port uri query-string]} request-map]
     (join [(if (nil? scheme) "" (format "%s://" (name scheme)))
            server-name
@@ -47,20 +47,26 @@
            (if (nil? query-string) "" (format "?%s" query-string))])))
 
 (defprotocol RouteMatcher
-  (matches [route request]))
+  (matches [address method request]))
 
 (extend-protocol RouteMatcher
   String
-  (matches [route request]
-    (matches (re-pattern (Pattern/quote route)) request))
+  (matches [address method request]
+    (matches (re-pattern (Pattern/quote address)) method request))
 
   Pattern
-  (matches [route request]
-    (let [request-strings (map request-string-for (potential-alternatives-to request))]
-      (some #(re-matches route %) request-strings))))
+  (matches [address method request]
+    (let [request-method (:request-method request)
+          address-strings (map address-string-for (potential-alternatives-to request))]
+      (and (contains? (set (distinct [:any nil request-method])) method)
+           (some #(re-matches address %) address-strings)))))
 
 (defn try-intercept [origfn request]
-  (if-let [matching-route (first (filter #(matches (:address %) request) *fake-routes*))]
+  (if-let [matching-route
+           (first
+            (filter
+             #(matches (:address %) (:method %) request)
+             *fake-routes*))]
     (let [route-handler (:handler matching-route)
           response (route-handler request)]
       (assoc response :body (util/utf8-bytes (:body response))))
