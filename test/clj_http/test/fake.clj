@@ -39,6 +39,13 @@
               {:status 200 :headers {} :body "R1BWm0"})}
            (:body (http/get "http://google.com/"))) "R1BWm0")))
 
+(deftest request-contains-default-scheme-but-route-doesnt
+  (is (= (with-fake-routes
+           {"google.com"
+            (fn [request]
+              {:status 200 :headers {} :body "EDWWO3"})}
+           (:body (http/get "http://google.com/"))) "EDWWO3")))
+
 (deftest matching-route-regular-expression
   (is (= (with-fake-routes
            {#"http://google.com/.*?\.html"
