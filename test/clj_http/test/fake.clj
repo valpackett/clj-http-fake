@@ -3,7 +3,8 @@
             [clj-http.core :as core]
             [clj-http.util :as util])
   (:use [clj-http.fake]
-        [clojure.test]))
+        [clojure.test]
+        :reload-all))
 
 (deftest matches-route-exactly
   (is (= (with-fake-routes
@@ -54,23 +55,4 @@
             (fn [request]
               {:status 200 :headers {} :body "UrIrHi"})}
            (:body (http/get "http://google.com/index.html"))) "UrIrHi")))
-
-(deftest falls-through-to-real-request-method-if-no-matching-route
-  (with-redefs [clj-http.core/request
-                (fn [req]
-                  {:status 200 :headers {} :body (util/utf8-bytes "zgBOaC")})]
-    (initialise-request-hook)
-    (with-fake-routes
-      {"http://idontmatch.com" (fn [req] {:status 200 :headers {} :body "wp8gJf"})}
-      (is (= (:body (http/get "http://somerandomhost.org")) "zgBOaC")))))
-
-(deftest throws-exception-if-in-isolation-mode-and-no-matching-route
-  (with-redefs [clj-http.core/request
-                (fn [req]
-                  {:status 200 :headers {} :body (util/utf8-bytes "1Z6xAB")})]
-    (initialise-request-hook)
-    (with-fake-routes-in-isolation
-      {"http://idontmatch.com"
-       (fn [req]
-         {:status 200 :headers {} :body "lL4QSc"})}
-      (is (thrown? Exception (http/get "http://somerandomhost.org"))))))
+=======
