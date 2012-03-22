@@ -99,7 +99,7 @@
   (with-redefs [clj-http.core/request
                 (fn [req]
                   {:status 200 :headers {} :body (util/utf8-bytes "zgBOaC")})]
-    (initialise-request-hook)
+    (initialize-request-hook)
     (with-fake-routes
       {"http://idontmatch.com" (fn [req] {:status 200 :headers {} :body "wp8gJf"})}
       (is (= (:body (http/get "http://somerandomhost.org")) "zgBOaC")))))
@@ -108,10 +108,9 @@
   (with-redefs [clj-http.core/request
                 (fn [req]
                   {:status 200 :headers {} :body (util/utf8-bytes "1Z6xAB")})]
-    (initialise-request-hook)
+    (initialize-request-hook)
     (with-fake-routes-in-isolation
       {"http://idontmatch.com"
        (fn [req]
          {:status 200 :headers {} :body "lL4QSc"})}
       (is (thrown? Exception (http/get "http://somerandomhost.org"))))))
->>>>>>> 7e403b0
