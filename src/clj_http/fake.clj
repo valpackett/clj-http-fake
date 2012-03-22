@@ -92,9 +92,9 @@
       (throw (Exception. "No matching fake route found to handle request."))
       (origfn request))))
 
-(defn initialise-request-hook []
+(defn initialize-request-hook []
   (add-hook
    #'clj-http.core/request
    #'try-intercept))
 
-(initialise-request-hook)
+(initialize-request-hook)
