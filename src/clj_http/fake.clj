@@ -37,30 +37,47 @@
         combinations (cartesian-product schemes server-ports uris)]
     (map #(merge request (zipmap [:scheme :server-port :uri] %)) combinations)))
 
-(defn- request-string-for [request-map]
+(defn- address-string-for [request-map]
   (let [{:keys [scheme server-name server-port uri query-string]} request-map]
-    (join [(if (nil? scheme) "" (format "%s://" (name scheme)))
+    (join [(if (nil? scheme)       "" (format "%s://" (name scheme)))
            server-name
-           (if (nil? server-port) "" (format ":%s" server-port))
-           (if (nil? uri) "" uri)
-           (if (nil? query-string) "" (format "?%s" query-string))])))
+           (if (nil? server-port)  "" (format ":%s"   server-port))
+           (if (nil? uri)          "" uri)
+           (if (nil? query-string) "" (format "?%s"   query-string))])))
 
 (defprotocol RouteMatcher
-  (matches [route request]))
+  (matches [address method request]))
 
 (extend-protocol RouteMatcher
   String
-  (matches [route request]
-    (matches (re-pattern (Pattern/quote route)) request))
+  (matches [address method request]
+    (matches (re-pattern (Pattern/quote address)) method request))
 
   Pattern
-  (matches [route request]
-    (let [request-strings (map request-string-for (potential-alternatives-to request))]
-      (some #(re-matches route %) request-strings))))
+  (matches [address method request]
+    (let [request-method (:request-method request)
+          address-strings (map address-string-for (potential-alternatives-to request))]
+      (and (contains? (set (distinct [:any request-method])) method)
+           (some #(re-matches address %) address-strings)))))
+
+(defn- flatten-routes [routes]
+  (let [normalised-routes
+        (reduce
+         (fn [accumulator [address handlers]]
+           (if (map? handlers)
+             (into accumulator (map (fn [[method handler]] [method address handler]) handlers))
+             (into accumulator [[:any address handlers]])))
+         []
+         routes)]
+    (map #(zipmap [:method :address :handler] %) normalised-routes)))
 
 (defn try-intercept [origfn request]
-  (if-let [matching-route (first (filter #(matches (key %) request) *fake-routes*))]
-    (let [route-handler (val matching-route)
+  (if-let [matching-route
+           (first
+            (filter
+             #(matches (:address %) (:method %) request)
+             (flatten-routes *fake-routes*)))]
+    (let [route-handler (:handler matching-route)
           response (route-handler request)]
       (assoc response :body (util/utf8-bytes (:body response))))
     (origfn request)))
