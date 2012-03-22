@@ -9,12 +9,16 @@ Basically, [fakeweb](https://github.com/chrisk/fakeweb) in Clojure, for [clj-htt
   (:require [clj-http.client :as c])
   (:use clj-http.fake))
 
+; also with-fake-routes-in-isolation if you don't want
+; to hit the network if no routes match
 (with-fake-routes
-  ; also supports regexps
-  {"http://google.com/" (fn [req] {:status 200 :headers {} :body "HACKED LOL HAHA"})}
+  {"http://google.com/" (fn [req] {:status 200 :headers {} :body "HACKED LOL HAHA"})
+   #"http://([a-z]+).floatboth.com" {:get (fn [req] {:status 200 :headers {} :body "trololo"})}}
   (c/get "http://google.com/"))
 ```
 
 ## License
 
 Released under the MIT License: http://www.opensource.org/licenses/mit-license.php
+
+## [Contributors](https://github.com/myfreeweb/clj-http-fake/contributors)
