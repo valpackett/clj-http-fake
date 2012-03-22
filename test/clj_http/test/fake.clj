@@ -55,4 +55,63 @@
             (fn [request]
               {:status 200 :headers {} :body "UrIrHi"})}
            (:body (http/get "http://google.com/index.html"))) "UrIrHi")))
-=======
+
+(deftest matches-correct-route-when-many-specified
+  (is (= (with-fake-routes
+           {"http://amazon.com"
+            (fn [request]
+              {:status 200 :headers {} :body "8jLUY7"})
+            "http://google.com"
+            (fn [reqeust]
+              {:status 200 :headers {} :body "5ttguy"})}
+           (:body (http/get "http://google.com"))) "5ttguy")))
+
+(deftest matches-on-method-if-specified
+  (is (= (with-fake-routes
+           {"http://localhost"
+            {:get    (fn [request] {:body "DCiTTN" :status 200 :headers {}})
+             :delete (fn [request] {:body "y4Swg8" :status 200 :headers {}})}}
+           (:body (http/delete "http://localhost"))) "y4Swg8")))
+
+(deftest matches-any-method-when-specified
+  (with-fake-routes
+    {"http://example.com"
+     {:any (fn [request] {:body "wp8gJf" :status 200 :headers {}})}}
+    (is (= (:body (http/get "http://example.com")) "wp8gJf"))
+    (is (= (:body (http/delete "http://example.com")) "wp8gJf"))))
+
+(deftest matches-any-method-when-no-method-specified
+  (with-fake-routes
+    {"http://example.com"
+     (fn [request] {:body "FyLNcb" :status 200 :headers {}})}
+    (is (= (:body (http/get "http://example.com")) "FyLNcb"))
+    (is (= (:body (http/delete "http://example.com")) "FyLNcb"))))
+
+(deftest uses-first-matching-route-if-many-possible-matches
+  (is (= (with-fake-routes
+           {"http://localhost"
+            (fn [request] {:body "mKmfyH" :status 200 :headers {}})
+            "http://localhost/"
+            (fn [request] {:body "rFGWGr" :status 200 :headers {}})}
+           (:body (http/get "http://localhost/"))) "mKmfyH")))
+
+(deftest falls-through-to-real-request-method-if-no-matching-route
+  (with-redefs [clj-http.core/request
+                (fn [req]
+                  {:status 200 :headers {} :body (util/utf8-bytes "zgBOaC")})]
+    (initialise-request-hook)
+    (with-fake-routes
+      {"http://idontmatch.com" (fn [req] {:status 200 :headers {} :body "wp8gJf"})}
+      (is (= (:body (http/get "http://somerandomhost.org")) "zgBOaC")))))
+
+(deftest throws-exception-if-in-isolation-mode-and-no-matching-route
+  (with-redefs [clj-http.core/request
+                (fn [req]
+                  {:status 200 :headers {} :body (util/utf8-bytes "1Z6xAB")})]
+    (initialise-request-hook)
+    (with-fake-routes-in-isolation
+      {"http://idontmatch.com"
+       (fn [req]
+         {:status 200 :headers {} :body "lL4QSc"})}
+      (is (thrown? Exception (http/get "http://somerandomhost.org"))))))
+>>>>>>> 7e403b0
