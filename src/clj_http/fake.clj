@@ -7,6 +7,14 @@
         [clojure.string :only [join]]))
 
 (def ^:dynamic *fake-routes* {})
+(def ^:dynamic *in-isolation* false)
+
+(defmacro with-fake-routes-in-isolation
+  "Makes all wrapped clj-http requests first match against given routes.
+  If no route matches, an exception is thrown."
+  [routes & body]
+  `(binding [*in-isolation* true]
+    (with-fake-routes ~routes ~@body)))
 
 (defmacro with-fake-routes
   "Makes all wrapped clj-http requests first match against given routes.
@@ -80,8 +88,13 @@
     (let [route-handler (:handler matching-route)
           response (route-handler request)]
       (assoc response :body (util/utf8-bytes (:body response))))
-    (origfn request)))
+    (if *in-isolation*
+      (throw (Exception. "No matching fake route found to handle request."))
+      (origfn request))))
 
-(add-hook
- #'clj-http.core/request
- #'try-intercept)
+(defn initialise-request-hook []
+  (add-hook
+   #'clj-http.core/request
+   #'try-intercept))
+
+(initialise-request-hook)
