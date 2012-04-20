@@ -114,3 +114,19 @@
        (fn [req]
          {:status 200 :headers {} :body "lL4QSc"})}
       (is (thrown? Exception (http/get "http://somerandomhost.org"))))))
+
+(defmacro other-thread
+  "Mostly like future but fails to preserve thread-local bindings."
+  [& body]
+  `(let [p# (promise)
+         t# (new Thread (fn [] (deliver p# (do ~@body))))]
+     (.start t#)
+     p#))
+
+(deftest requesting-on-different-thread-test
+  (is (= (with-global-fake-routes
+           {"http://floatboth.com:2020/path/resource.ext?key=value"
+            (fn [request]
+              {:status 200 :headers {} :body "29RQPV"})}
+           @(other-thread (:body (http/get "http://floatboth.com:2020/path/resource.ext?key=value"))))
+         "29RQPV")))
