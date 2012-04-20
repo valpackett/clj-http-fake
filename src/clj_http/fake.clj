@@ -20,11 +20,22 @@
   "Makes all wrapped clj-http requests first match against given routes.
   The actual HTTP request will be sent only if no matches are found."
   [routes & body]
-  `(do
-     (let [s# ~routes]
-       (assert (map? s#))
-       (binding [*fake-routes* s#]
-         ~@body))))
+  `(let [s# ~routes]
+    (assert (map? s#))
+    (binding [*fake-routes* s#]
+      ~@body)))
+
+(defmacro with-global-fake-routes-in-isolation
+  [routes & body]
+  `(with-redefs [*in-isolation* true]
+     (with-global-fake-routes ~routes ~@body)))
+
+(defmacro with-global-fake-routes
+  [routes & body]
+  `(let [s# ~routes]
+     (assert (map? s#))
+     (with-redefs [*fake-routes* s#]
+       ~@body)))
 
 (defn- defaults-or-value [defaults value]
   (if (contains? defaults value) (reverse (vec defaults)) (vector value)))
