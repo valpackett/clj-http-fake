@@ -49,12 +49,16 @@
 (defn- potential-schemes-for [request-map]
   (defaults-or-value #{:http nil} (keyword (:scheme request-map))))
 
+(defn- potential-query-strings-for [request-map]
+  (defaults-or-value #{"" nil} (:query-string request-map)))
+
 (defn- potential-alternatives-to [request]
-  (let [schemes      (potential-schemes-for      request)
-        server-ports (potential-server-ports-for request)
-        uris         (potential-uris-for         request)
-        combinations (cartesian-product schemes server-ports uris)]
-    (map #(merge request (zipmap [:scheme :server-port :uri] %)) combinations)))
+  (let [schemes       (potential-schemes-for       request)
+        server-ports  (potential-server-ports-for  request)
+        uris          (potential-uris-for          request)
+        query-strings (potential-query-strings-for request)
+        combinations  (cartesian-product schemes server-ports uris query-strings)]
+    (map #(merge request (zipmap [:scheme :server-port :uri :query-string] %)) combinations)))
 
 (defn- address-string-for [request-map]
   (let [{:keys [scheme server-name server-port uri query-string]} request-map]

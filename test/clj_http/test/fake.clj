@@ -130,3 +130,8 @@
               {:status 200 :headers {} :body "29RQPV"})}
            @(other-thread (:body (http/get "http://floatboth.com:2020/path/resource.ext?key=value"))))
          "29RQPV")))
+
+(deftest get-request-contains-empty-query-params
+  (is (= (with-fake-routes-in-isolation
+           {#".*/foo/bar" (constantly {:status 200 :headers {} :body "that's my foo bar"})}
+           (:body (http/get "http://floatboth.com/achey/breaky/foo/bar" {:query-params {}}))))))
