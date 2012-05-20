@@ -135,3 +135,10 @@
   (is (= (with-fake-routes-in-isolation
            {#".*/foo/bar" (constantly {:status 200 :headers {} :body "that's my foo bar"})}
            (:body (http/get "http://floatboth.com/achey/breaky/foo/bar" {:query-params {}}))))))
+
+(deftest request-contains-query-params
+  (is (= (with-fake-routes
+           {"http://google.com/?test=test"
+            (fn [request]
+              {:status 200 :headers {} :body "4XbAfG"})}
+           (:body (http/get "http://google.com/" {:query-params {:test "test"}}))) "4XbAfG")))
