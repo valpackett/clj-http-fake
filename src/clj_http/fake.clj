@@ -104,7 +104,10 @@
           response (route-handler request)]
       (assoc response :body (util/utf8-bytes (:body response))))
     (if *in-isolation*
-      (throw (Exception. "No matching fake route found to handle request."))
+      (throw (Exception.
+              (apply format
+               "No matching fake route found to handle request. Reuqest details: \n\t%s \n\t%s \n\t%s \n\t%s \n\t%s "
+               (select-keys request [:scheme :request-method :server-name :uri :query-string]))))
       (origfn request))))
 
 (defn initialize-request-hook []
