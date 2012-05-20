@@ -6,7 +6,7 @@ Basically, [fakeweb](https://github.com/chrisk/fakeweb) in Clojure, for [clj-htt
 
 In your ```project.clj``` file:
 
-```
+```clojure
 [clj-http-fake "0.3.0"]
 ```
 
@@ -41,7 +41,9 @@ In your namespace declaration:
   ;; Match multiple HTTP methods:
   "http://doogle.com/" {:get    (fn [req] {:status 200 :headers {} :body "Nah, that can't be Google!"})
                         :delete (fn [req] {:status 401 :headers {} :body "Do you think you can delete me?!"})}
-})
+ }
+ ;; Your tests with requests here
+ )
 ```
 ## License
 
