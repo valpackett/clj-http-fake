@@ -116,6 +116,3 @@
    #'try-intercept))
 
 (initialize-request-hook)
-
-
-
