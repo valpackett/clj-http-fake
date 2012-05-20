@@ -1,4 +1,4 @@
-# clj-http-fake [![Maintained Status](http://stillmaintained.com/myfreeweb/clj-http-fake.png)](http://stillmaintained.com/myfreeweb/clj-http-fake)
+# clj-http-fake
 
 Basically, [fakeweb](https://github.com/chrisk/fakeweb) in Clojure, for [clj-http](https://github.com/dakrone/clj-http).
 
@@ -7,10 +7,10 @@ Basically, [fakeweb](https://github.com/chrisk/fakeweb) in Clojure, for [clj-htt
 In your ```project.clj``` file:
 
 ```
-[clj-http-fake          "0.3.0"]
+[clj-http-fake "0.3.0"]
 ```
 
-In your namespace declaration::
+In your namespace declaration:
 
 ```clojure
 (ns myapp.test.core
@@ -32,19 +32,19 @@ In your namespace declaration::
 
   ;; Regexp match:
   #"http://([a-z]+).floatboth.com" (fn [req] {:status 200 :headers {} :body "trololo"})
-  ;; matches (c/get "http://yo.floatboth.com"), (c/get "http://peace.floatboth.com"), (c/get "http://bro.floatboth.com") and so on, based on regexp.
+  ;; matches (c/get "http://labs.floatboth.com"), (c/get "http://ringfinger.floatboth.com") and so on, based on regexp.
 
   ;; Match based an HTTP method:
-  "http://shmoogle.com/" {:get (fn [request] {:status 200 :headers {} :body "What is Scmoogle anyways?"})}
+  "http://shmoogle.com/" {:get (fn [req] {:status 200 :headers {} :body "What is Scmoogle anyways?"})}
   ;; will match only (c/get "http://google.com/")
 
   ;; Match multiple HTTP methods:
-  "http://doogle.com/" {:get (fn [request] {:status 200 :headers {} :body "Nah, that can't be Google!"})
-                       :delete (fn [request] {:status 401 :headers {} :body "Do you think you can delete me?!"})}
+  "http://doogle.com/" {:get    (fn [req] {:status 200 :headers {} :body "Nah, that can't be Google!"})
+                        :delete (fn [req] {:status 401 :headers {} :body "Do you think you can delete me?!"})}
 })
 ```
 ## License
 
-Released under the MIT License: http://www.opensource.org/licenses/mit-license.php
+Released under [the MIT License](http://www.opensource.org/licenses/mit-license.php).
 
 ## [Contributors](https://github.com/myfreeweb/clj-http-fake/contributors)
