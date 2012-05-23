@@ -4,7 +4,7 @@
             [clj-http.util :as util])
   (:use [robert.hooke]
         [clojure.math.combinatorics]
-        [clojure.string :only [join]]))
+        [clojure.string :only [join split]]))
 
 (def ^:dynamic *fake-routes* {})
 (def ^:dynamic *in-isolation* false)
@@ -49,8 +49,13 @@
 (defn- potential-schemes-for [request-map]
   (defaults-or-value #{:http nil} (keyword (:scheme request-map))))
 
+
 (defn- potential-query-strings-for [request-map]
-  (defaults-or-value #{"" nil} (:query-string request-map)))
+  (let [queries (defaults-or-value #{"" nil} (:query-string request-map))
+        query-supplied (= (count queries) 1)]
+    (if query-supplied
+      (vec (map (partial join "&") (permutations (split (first queries) #"&|;"))))
+      queries)))
 
 (defn- potential-alternatives-to [request]
   (let [schemes       (potential-schemes-for       request)
