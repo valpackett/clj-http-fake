@@ -54,7 +54,7 @@
   (let [queries (defaults-or-value #{"" nil} (:query-string request-map))
         query-supplied (= (count queries) 1)]
     (if query-supplied
-      (vec (map #(join "&" %1) (permutations (split (first queries) #"&|;"))))
+      (vec (map (partial join "&") (permutations (split (first queries) #"&|;"))))
       queries)))
 
 (defn- potential-alternatives-to [request]
