@@ -7,7 +7,7 @@ Basically, [fakeweb](https://github.com/chrisk/fakeweb) in Clojure, for [clj-htt
 In your ```project.clj``` file:
 
 ```clojure
-[clj-http-fake "0.3.0"]
+[clj-http-fake "0.4.1"]
 ```
 
 In your namespace declaration:
