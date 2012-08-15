@@ -111,7 +111,7 @@
     (if *in-isolation*
       (throw (Exception.
               (apply format
-               "No matching fake route found to handle request. Reuqest details: \n\t%s \n\t%s \n\t%s \n\t%s \n\t%s "
+               "No matching fake route found to handle request. Request details: \n\t%s \n\t%s \n\t%s \n\t%s \n\t%s "
                (select-keys request [:scheme :request-method :server-name :uri :query-string]))))
       (origfn request))))
 
