@@ -148,23 +148,32 @@
            {"http://google.com/?fst=test1&sec=test2"
             (fn [request]
               {:status 200 :headers {} :body "ASd0gf"})}
-           (:body (http/get "http://google.com/" {:query-params {:fst "test1", 
+           (:body (http/get "http://google.com/" {:query-params {:fst "test1",
                                                                  :sec "test2"}}))) "ASd0gf"))
   (is (= (with-fake-routes
            {"http://google.com/?sec=test2&fst=test1"
             (fn [request]
               {:status 200 :headers {} :body "oDKL13"})}
-           (:body (http/get "http://google.com/" {:query-params {:fst "test1", 
+           (:body (http/get "http://google.com/" {:query-params {:fst "test1",
                                                                  :sec "test2"}}))) "oDKL13"))
   (is (= (with-fake-routes
            {"http://google.com/?fst=test1&sec=test2"
             (fn [request]
               {:status 200 :headers {} :body "BXC9ai"})}
-           (:body (http/get "http://google.com/" {:query-params {:sec "test2", 
+           (:body (http/get "http://google.com/" {:query-params {:sec "test2",
                                                                  :fst "test1"}}))) "BXC9ai"))
   (is (= (with-fake-routes
            {"http://google.com/?sec=test2&fst=test1"
             (fn [request]
               {:status 200 :headers {} :body "91nOjA"})}
-           (:body (http/get "http://google.com/" {:query-params {:sec "test2", 
+           (:body (http/get "http://google.com/" {:query-params {:sec "test2",
                                                                  :fst "test1"}}))) "91nOjA")))
+
+(deftest query-params-specified-as-map
+  (is (= (with-fake-routes-in-isolation
+           {{:address "http://google.com/search"
+             :query-params {:q "aardvark"}}
+            (fn [request]
+              {:status 200 :headers {} :body "anteater"})}
+           (:body (http/get "http://google.com/search" {:query-params {:q "aardvark"}}))) "anteater")))
+
