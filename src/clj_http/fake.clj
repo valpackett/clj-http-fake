@@ -1,5 +1,6 @@
 (ns clj-http.fake
-  (:import [java.util.regex Pattern])
+  (:import [java.util.regex Pattern]
+           [java.util Map])
   (:require [clj-http.client :as client]
             [clj-http.util :as util])
   (:use [robert.hooke]
@@ -86,7 +87,13 @@
     (let [request-method (:request-method request)
           address-strings (map address-string-for (potential-alternatives-to request))]
       (and (contains? (set (distinct [:any request-method])) method)
-           (some #(re-matches address %) address-strings)))))
+           (some #(re-matches address %) address-strings))))
+  Map
+  (matches [address method request]
+    (let [query-string (client/generate-query-string (:query-params address))
+          url (str (:address address) "?" query-string)]
+      (matches url method request))))
+
 
 (defn- flatten-routes [routes]
   (let [normalised-routes
