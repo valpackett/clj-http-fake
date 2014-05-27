@@ -2,6 +2,4 @@ lein: lein2
 script: lein2 test-newest
 script: lein2 test-oldest
 
-jdk:
-  -oraclejdk7
-  -openjdk7
+
