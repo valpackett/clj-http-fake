@@ -1,7 +1,6 @@
 # clj-http-fake
 
-[![Build
-Status][]<https://travis-ci.org/timgluz/clj-http-fake.svg>](https://travis-ci.org/timgluz/clj-http-fake)
+[![Build Status](https://travis-ci.org/timgluz/clj-http-fake.svg?branch=update_deps)](https://travis-ci.org/timgluz/clj-http-fake)
 
 Basically, [fakeweb][] in Clojure, for [clj-http][].
 
@@ -51,7 +50,7 @@ In your namespace declaration:
 
 Released under [the MIT License][].
 
-## [Contributors][]
+## [Contributors]
 
   [![Build Status]: #
   [fakeweb]: https://github.com/chrisk/fakeweb
