@@ -1,8 +1,8 @@
 (ns clj-http.fake
   (:import [java.util.regex Pattern]
            [java.util Map])
-  (:require [clj-http.client :as client]
-            [clj-http.util :as util])
+  (:require
+    [cemerick.url :as url-util])
   (:use [robert.hooke]
         [clojure.math.combinatorics]
         [clojure.string :only [join split]]))
@@ -90,7 +90,7 @@
            (some #(re-matches address %) address-strings))))
   Map
   (matches [address method request]
-    (let [query-string (client/generate-query-string (:query-params address))
+    (let [query-string (url-util/map->query (:query-params address))
           url (str (:address address) "?" query-string)]
       (matches url method request))))
 
@@ -106,6 +106,11 @@
          routes)]
     (map #(zipmap [:method :address :handler] %) normalised-routes)))
 
+(defn utf8-bytes
+    "Returns the UTF-8 bytes corresponding to the given string."
+    [^String s]
+    (.getBytes s "UTF-8"))
+
 (defn try-intercept [origfn request]
   (if-let [matching-route
            (first
@@ -114,7 +119,7 @@
              (flatten-routes *fake-routes*)))]
     (let [route-handler (:handler matching-route)
           response (route-handler request)]
-      (assoc response :body (util/utf8-bytes (:body response))))
+      (assoc response :body (utf8-bytes (:body response))))
     (if *in-isolation*
       (throw (Exception.
               (apply format
