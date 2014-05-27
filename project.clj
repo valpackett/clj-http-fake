@@ -1,4 +1,4 @@
-(defproject clj-http-fake "0.7.8"
+(defproject clj-http-fake "0.9.2"
   :description "Helper for faking clj-http requests. For testing. You monster."
   :url "https://github.com/myfreeweb/clj-http-fake"
   :license {:name "MIT License"
@@ -6,7 +6,6 @@
             :distribution :repo}
   :min-lein-version "2.0.0"
   :dependencies [[org.clojure/math.combinatorics "0.0.7"]
-                 [com.cemerick/url "0.1.1"]
                  [robert/hooke "1.3.0"]]
   :aliases {"test-newest" ["with-profile" "newest,1.5:newest,1.6" "test"]
             "test-oldest" ["with-profile" "oldest,1.5:oldest,1.6" "test"]}

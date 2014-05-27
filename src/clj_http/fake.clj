@@ -1,8 +1,7 @@
 (ns clj-http.fake
   (:import [java.util.regex Pattern]
-           [java.util Map])
-  (:require
-    [cemerick.url :as url-util])
+           [java.util Map]
+           [java.net URLEncoder URLDecoder])
   (:use [robert.hooke]
         [clojure.math.combinatorics]
         [clojure.string :only [join split]]))
@@ -77,6 +76,26 @@
 (defprotocol RouteMatcher
   (matches [address method request]))
 
+
+(defn url-encode
+  "encodes string into valid URL string"
+  [string]
+  (some-> string str (URLEncoder/encode "UTF-8") (.replace "+" "%20")))
+
+(defn map->query
+  "converts Clojure map with query-params into URL query-string.
+  It's taken from cemerick.url library"
+  [m]
+    (some->> (seq m)
+      sort                     ; sorting makes testing a lot easier :-)
+      (map (fn [[k v]]
+              [(url-encode (name k))
+              "="
+              (url-encode (str v))]))
+      (interpose "&")
+      flatten
+      (apply str)))
+
 (extend-protocol RouteMatcher
   String
   (matches [address method request]
@@ -90,7 +109,7 @@
            (some #(re-matches address %) address-strings))))
   Map
   (matches [address method request]
-    (let [query-string (url-util/map->query (:query-params address))
+    (let [query-string (map->query (:query-params address))
           url (str (:address address) "?" query-string)]
       (matches url method request))))
 
