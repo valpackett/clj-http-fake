@@ -1,7 +1,8 @@
 (ns clj-http.fake
   (:import [java.util.regex Pattern]
            [java.util Map]
-           [java.net URLEncoder URLDecoder])
+           [java.net URLEncoder URLDecoder]
+           [org.apache.http HttpEntity])
   (:use [robert.hooke]
         [clojure.math.combinatorics]
         [clojure.string :only [join split]]))
@@ -130,6 +131,11 @@
     [^String s]
     (.getBytes s "UTF-8"))
 
+(defn- unwrap-body [request]
+  (if (instance? HttpEntity (:body request))
+    (assoc request :body (.getContent (:body request)))
+    request))
+
 (defn try-intercept [origfn request]
   (if-let [matching-route
            (first
@@ -137,7 +143,7 @@
              #(matches (:address %) (:method %) request)
              (flatten-routes *fake-routes*)))]
     (let [route-handler (:handler matching-route)
-          response (route-handler request)]
+          response (route-handler (unwrap-body request))]
       (assoc response :body (utf8-bytes (:body response))))
     (if *in-isolation*
       (throw (Exception.

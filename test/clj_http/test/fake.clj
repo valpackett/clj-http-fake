@@ -143,6 +143,13 @@
               {:status 200 :headers {} :body "4XbAfG"})}
            (:body (http/get "http://google.com/" {:query-params {:test "test"}}))) "4XbAfG")))
 
+(deftest request-contains-form-params
+  (is (= (with-fake-routes
+           {"http://google.com/"
+            (fn [request]
+              {:status 200 :headers {} :body (slurp (:body request))})}
+           (:body (http/post "http://google.com/" {:form-params {:test "4XbAfG"}}))) "test=4XbAfG")))
+
 (deftest request-query-param-order-does-not-matter
   (is (= (with-fake-routes
            {"http://google.com/?fst=test1&sec=test2"
