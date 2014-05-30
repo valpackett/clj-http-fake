@@ -1,5 +1,9 @@
 # clj-http-fake
 
+[![Build Status](https://travis-ci.org/timgluz/clj-http-fake.svg?branch=update_deps)](https://travis-ci.org/timgluz/clj-http-fake)
+
+# clj-http-fake
+
 Basically, [fakeweb](https://github.com/chrisk/fakeweb) in Clojure, for [clj-http](https://github.com/dakrone/clj-http).
 
 ## Usage

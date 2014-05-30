@@ -1,8 +1,7 @@
 (ns clj-http.fake
   (:import [java.util.regex Pattern]
-           [java.util Map])
-  (:require [clj-http.client :as client]
-            [clj-http.util :as util])
+           [java.util Map]
+           [java.net URLEncoder URLDecoder])
   (:use [robert.hooke]
         [clojure.math.combinatorics]
         [clojure.string :only [join split]]))
@@ -77,6 +76,26 @@
 (defprotocol RouteMatcher
   (matches [address method request]))
 
+
+(defn url-encode
+  "encodes string into valid URL string"
+  [string]
+  (some-> string str (URLEncoder/encode "UTF-8") (.replace "+" "%20")))
+
+(defn map->query
+  "converts Clojure map with query-params into URL query-string.
+  It's taken from cemerick.url library"
+  [m]
+    (some->> (seq m)
+      sort                     ; sorting makes testing a lot easier :-)
+      (map (fn [[k v]]
+              [(url-encode (name k))
+              "="
+              (url-encode (str v))]))
+      (interpose "&")
+      flatten
+      (apply str)))
+
 (extend-protocol RouteMatcher
   String
   (matches [address method request]
@@ -90,7 +109,7 @@
            (some #(re-matches address %) address-strings))))
   Map
   (matches [address method request]
-    (let [query-string (client/generate-query-string (:query-params address))
+    (let [query-string (map->query (:query-params address))
           url (str (:address address) "?" query-string)]
       (matches url method request))))
 
@@ -106,6 +125,11 @@
          routes)]
     (map #(zipmap [:method :address :handler] %) normalised-routes)))
 
+(defn utf8-bytes
+    "Returns the UTF-8 bytes corresponding to the given string."
+    [^String s]
+    (.getBytes s "UTF-8"))
+
 (defn try-intercept [origfn request]
   (if-let [matching-route
            (first
@@ -114,7 +138,7 @@
              (flatten-routes *fake-routes*)))]
     (let [route-handler (:handler matching-route)
           response (route-handler request)]
-      (assoc response :body (util/utf8-bytes (:body response))))
+      (assoc response :body (utf8-bytes (:body response))))
     (if *in-isolation*
       (throw (Exception.
               (apply format
