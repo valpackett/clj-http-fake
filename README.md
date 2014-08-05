@@ -1,6 +1,4 @@
-# clj-http-fake
-
-[![Build Status](https://travis-ci.org/timgluz/clj-http-fake.svg?branch=update_deps)](https://travis-ci.org/timgluz/clj-http-fake)
+# clj-http-fake [![Build Status](https://img.shields.io/travis/myfreeweb/clj-http-fake.svg?style=flat)](https://travis-ci.org/myfreeweb/clj-http-fake) [![MIT License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat)](https://www.tldrlegal.com/l/mit)
 
 # clj-http-fake
 
