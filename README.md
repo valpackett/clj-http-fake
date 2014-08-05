@@ -1,7 +1,5 @@
 # clj-http-fake [![Build Status](https://img.shields.io/travis/myfreeweb/clj-http-fake.svg?style=flat)](https://travis-ci.org/myfreeweb/clj-http-fake) [![MIT License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat)](https://www.tldrlegal.com/l/mit)
 
-# clj-http-fake
-
 Basically, [fakeweb](https://github.com/chrisk/fakeweb) in Clojure, for [clj-http](https://github.com/dakrone/clj-http).
 
 ## Usage
