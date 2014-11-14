@@ -1,4 +1,4 @@
-(defproject clj-http-fake "0.7.8"
+(defproject clj-http-fake "1.0.1"
   :description "Helper for faking clj-http requests. For testing. You monster."
   :url "https://github.com/myfreeweb/clj-http-fake"
   :license {:name "MIT License"
@@ -12,5 +12,5 @@
   :profiles {:1.6 {:dependencies [[org.clojure/clojure "1.6.0"]]}
              :1.5 {:dependencies [[org.clojure/clojure "1.5.1"]]}
              ;;the newest supported version of clj-http
-             :newest {:dependencies [[clj-http "0.9.2"]]}
+             :newest {:dependencies [[clj-http "1.0.1"]]}
              :oldest {:dependencies [[clj-http "0.7.8"]]}})
