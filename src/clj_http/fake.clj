@@ -3,6 +3,7 @@
            [java.util Map]
            [java.net URLEncoder URLDecoder]
            [org.apache.http HttpEntity])
+  (:require [clj-http.core])
   (:use [robert.hooke]
         [clojure.math.combinatorics]
         [clojure.string :only [join split]]))
