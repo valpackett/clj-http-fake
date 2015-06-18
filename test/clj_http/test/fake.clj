@@ -182,5 +182,11 @@
              :query-params {:q "aardvark"}}
             (fn [request]
               {:status 200 :headers {} :body "anteater"})}
-           (:body (http/get "http://google.com/search" {:query-params {:q "aardvark"}}))) "anteater")))
+           (:body (http/get "http://google.com/search" {:query-params {:q "aardvark"}}))) "anteater"))
 
+  (is (= (with-fake-routes-in-isolation
+           {{:address #"http://google.com/[abc]{3}"
+             :query-params {:q "aardvark"}}
+            (fn [request]
+              {:status 200 :headers {} :body "anteater"})}
+           (:body (http/get "http://google.com/aab" {:query-params {:q "aardvark"}}))))))

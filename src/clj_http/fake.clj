@@ -111,9 +111,14 @@
            (some #(re-matches address %) address-strings))))
   Map
   (matches [address method request]
-    (let [query-string (map->query (:query-params address))
-          url (str (:address address) "?" query-string)]
-      (matches url method request))))
+    (if (instance? Pattern (:address address))
+      (let [query-string (map->query (:query-params address))
+            regex (re-pattern (str (:address address)
+                                   (Pattern/quote (str "?" query-string))))]
+        (matches regex method request))
+      (let [query-string (map->query (:query-params address))
+            url (str (:address address) "?" query-string)]
+        (matches url method request)))))
 
 
 (defn- flatten-routes [routes]
