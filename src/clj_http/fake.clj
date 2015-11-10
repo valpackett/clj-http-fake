@@ -137,6 +137,20 @@
     [^String s]
     (.getBytes s "UTF-8"))
 
+
+(let [byte-array-type (Class/forName "[B")]
+  (defn- byte-array?
+    "Is `obj` a java byte array?"
+    [obj]
+    (instance? byte-array-type obj)))
+
+(defn body-bytes
+  "If `obj` is a byte-array, return it, otherwise use `utf8-bytes`."
+  [obj]
+  (if (byte-array? obj)
+    obj
+    (utf8-bytes obj)))
+
 (defn- unwrap-body [request]
   (if (instance? HttpEntity (:body request))
     (assoc request :body (.getContent (:body request)))
@@ -150,7 +164,7 @@
              (flatten-routes *fake-routes*)))]
     (let [route-handler (:handler matching-route)
           response (route-handler (unwrap-body request))]
-      (assoc response :body (utf8-bytes (:body response))))
+      (assoc response :body (body-bytes (:body response))))
     (if *in-isolation*
       (throw (Exception.
               (apply format

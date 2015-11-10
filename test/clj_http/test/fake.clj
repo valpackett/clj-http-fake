@@ -190,3 +190,15 @@
             (fn [request]
               {:status 200 :headers {} :body "anteater"})}
            (:body (http/get "http://google.com/aab" {:query-params {:q "aardvark"}}))))))
+
+(deftest get-as-byte-array
+  (let [body (.getBytes "anteater")]
+    (is (= (seq body)
+           (seq (with-fake-routes-in-isolation
+                  {{:address #"http://google.com/[abc]{3}"
+                    :query-params {:q "aardvark"}}
+                   (fn [request]
+                     {:status 200 :headers {} :body body})}
+                  (:body (http/get "http://google.com/aab"
+                                   {:as :byte-array
+                                    :query-params {:q "aardvark"}}))))))))
