@@ -29,8 +29,8 @@ In your namespace declaration:
   ;; matches (c/get "http://google.com/" {:query-params {:query "param"}})
 
   ;; Regexp match:
-  #"http://([a-z]+).floatboth.com" (fn [req] {:status 200 :headers {} :body "trololo"})
-  ;; matches (c/get "http://labs.floatboth.com"), (c/get "http://ringfinger.floatboth.com") and so on, based on regexp.
+  #"https://([a-z]+).unrelenting.technology" (fn [req] {:status 200 :headers {} :body "Hello world"})
+  ;; matches (c/get "https://labs.unrelenting.technology"), (c/get "https://server.unrelenting.technology") and so on, based on regexp.
 
   ;; Match based an HTTP method:
   "http://shmoogle.com/" {:get (fn [req] {:status 200 :headers {} :body "What is Scmoogle anyways?"})}
@@ -47,6 +47,18 @@ In your namespace declaration:
  ;; Your tests with requests here
  )
 ```
+
+## Development
+
+Use [Leiningen](http://leiningen.org) with profiles.
+
+There are aliases to run the tests with the oldest and newest supported versions of clj-http:
+
+```
+$ lein test-newest
+$ lein test-oldest
+```
+
 ## License
 
 Released under [the MIT License](http://www.opensource.org/licenses/mit-license.php).
