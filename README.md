@@ -42,7 +42,7 @@ In your namespace declaration:
 
   ;; Match using query params as a map
    {:address "http://google.com/search"
-    :query-params {:q "aardark"}} (fn [req] {:status 200 :headers {} :body "Searches have results"}
+    :query-params {:q "aardark"}} (fn [req] {:status 200 :headers {} :body "Searches have results"})
  }
  ;; Your tests with requests here
  )
