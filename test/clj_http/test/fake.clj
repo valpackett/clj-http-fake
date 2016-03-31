@@ -189,7 +189,17 @@
              :query-params {:q "aardvark"}}
             (fn [request]
               {:status 200 :headers {} :body "anteater"})}
-           (:body (http/get "http://google.com/aab" {:query-params {:q "aardvark"}}))))))
+           (:body (http/get "http://google.com/aab" {:query-params {:q "aardvark"}})))))
+
+  (testing "with spaces in the query params"
+    (is (= (with-fake-routes-in-isolation
+             {{:address "http://google.com/search"
+               :query-params {:q "this has spaces"}}
+              (fn [request]
+                {:status 200 :headers {} :body "anteater"})}
+             (:body (http/get "http://google.com/search"
+                              {:query-params {:q "this has spaces"}})))
+           "anteater"))))
 
 (deftest get-as-byte-array
   (let [body (.getBytes "anteater")]
