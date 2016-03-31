@@ -3,7 +3,8 @@
            [java.util Map]
            [java.net URLEncoder URLDecoder]
            [org.apache.http HttpEntity])
-  (:require [clj-http.core])
+  (:require [clj-http.core]
+            [ring.util.codec :as ring-codec])
   (:use [robert.hooke]
         [clojure.math.combinatorics]
         [clojure.string :only [join split]]))
@@ -84,19 +85,13 @@
   [string]
   (some-> string str (URLEncoder/encode "UTF-8") (.replace "+" "%20")))
 
-(defn map->query
-  "converts Clojure map with query-params into URL query-string.
-  It's taken from cemerick.url library"
-  [m]
-    (some->> (seq m)
-      sort                     ; sorting makes testing a lot easier :-)
-      (map (fn [[k v]]
-              [(url-encode (name k))
-              "="
-              (url-encode (str v))]))
-      (interpose "&")
-      flatten
-      (apply str)))
+(defn- query-params-match?
+  [expected-query-params request]
+  (let [actual-query-params (or (some-> request :query-string ring-codec/form-decode) {})]
+    (and (= (count expected-query-params) (count actual-query-params))
+         (every? (fn [[k v]]
+                   (= v (get actual-query-params (if (string? k) k (name k)))))
+                 expected-query-params))))
 
 (extend-protocol RouteMatcher
   String
@@ -111,14 +106,11 @@
            (some #(re-matches address %) address-strings))))
   Map
   (matches [address method request]
-    (if (instance? Pattern (:address address))
-      (let [query-string (map->query (:query-params address))
-            regex (re-pattern (str (:address address)
-                                   (Pattern/quote (str "?" query-string))))]
-        (matches regex method request))
-      (let [query-string (map->query (:query-params address))
-            url (str (:address address) "?" query-string)]
-        (matches url method request)))))
+    (let [{expected-query-params :query-params} address]
+      (and (or (nil? expected-query-params)
+               (query-params-match? expected-query-params request))
+           (let [request (cond-> request expected-query-params (dissoc :query-string))]
+             (matches (:address address) method request))))))
 
 
 (defn- flatten-routes [routes]
