@@ -7,7 +7,8 @@
   :min-lein-version "2.0.0"
   :dependencies [[org.clojure/math.combinatorics "0.1.1"]
                  [robert/hooke "1.3.0"]
-                 [clj-http "2.0.0"]]    ;; Needed here or lein might not compile clj-http first, resulting in broken builds
+                 [clj-http "2.0.0"] ;; Needed here or lein might not compile clj-http first, resulting in broken builds
+                 [ring/ring-codec "1.0.0"]]
   :aliases {"test-newest" ["with-profile" "newest,1.5:newest,1.6:newest,1.7" "test"]
             "test-oldest" ["with-profile" "oldest,1.5:oldest,1.6:oldest,1.7" "test"]}
   :profiles {:1.7 {:dependencies [[org.clojure/clojure "1.7.0"]]}
