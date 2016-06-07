@@ -214,3 +214,9 @@
                   (:body (http/get "http://google.com/aab"
                                    {:as :byte-array
                                     :query-params {:q "aardvark"}}))))))))
+
+(deftest response-map-default-fields
+  (testing "if no :body is given, the body is empty"
+    (is (= (with-fake-routes {"http://google.com/" (constantly {:status 200})}
+             (:body (http/get "http://google.com/")))
+           ""))))
