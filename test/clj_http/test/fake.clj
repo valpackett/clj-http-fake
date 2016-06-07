@@ -219,4 +219,15 @@
   (testing "if no :body is given, the body is empty"
     (is (= (with-fake-routes {"http://google.com/" (constantly {:status 200})}
              (:body (http/get "http://google.com/")))
-           ""))))
+           "")))
+
+  (testing "if no :status is given, the it is assumed to be 200"
+    (is (= (with-fake-routes {"http://google.com/" (constantly {:body "OK"})}
+             (:status (http/get "http://google.com/")))
+           200)))
+
+  (testing "defaults when both :status and :body are missing"
+    (let [response (with-fake-routes {"http://google.com/" (constantly {})}
+                     (http/get "http://google.com/"))]
+      (is (= (:status response) 200))
+      (is (= (:body response) "")))))

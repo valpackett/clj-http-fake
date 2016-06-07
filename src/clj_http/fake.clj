@@ -155,8 +155,9 @@
              #(matches (:address %) (:method %) request)
              (flatten-routes *fake-routes*)))]
     (let [route-handler (:handler matching-route)
-          response (route-handler (unwrap-body request))]
-      (assoc response :body (body-bytes (:body response ""))))
+          response (merge {:status 200 :body ""}
+                          (route-handler (unwrap-body request)))]
+      (assoc response :body (body-bytes (:body response))))
     (if *in-isolation*
       (throw (Exception.
               (apply format
