@@ -134,7 +134,8 @@
 (deftest get-request-contains-empty-query-params
   (is (= (with-fake-routes-in-isolation
            {#".*/foo/bar" (constantly {:status 200 :headers {} :body "that's my foo bar"})}
-           (:body (http/get "http://floatboth.com/achey/breaky/foo/bar" {:query-params {}}))))))
+           (:body (http/get "http://floatboth.com/achey/breaky/foo/bar" {:query-params {}})))
+         "that's my foo bar")))
 
 (deftest request-contains-query-params
   (is (= (with-fake-routes
@@ -189,7 +190,8 @@
              :query-params {:q "aardvark"}}
             (fn [request]
               {:status 200 :headers {} :body "anteater"})}
-           (:body (http/get "http://google.com/aab" {:query-params {:q "aardvark"}})))))
+           (:body (http/get "http://google.com/aab" {:query-params {:q "aardvark"}})))
+         "anteater"))
 
   (testing "with spaces in the query params"
     (is (= (with-fake-routes-in-isolation
