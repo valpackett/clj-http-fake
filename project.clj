@@ -9,9 +9,10 @@
                  [robert/hooke "1.3.0"]
                  [clj-http "2.0.0"] ;; Needed here or lein might not compile clj-http first, resulting in broken builds
                  [ring/ring-codec "1.0.0"]]
-  :aliases {"test-newest" ["with-profile" "newest,1.5:newest,1.6:newest,1.7" "test"]
-            "test-oldest" ["with-profile" "oldest,1.5:oldest,1.6:oldest,1.7" "test"]}
-  :profiles {:1.7 {:dependencies [[org.clojure/clojure "1.7.0"]]}
+  :aliases {"test-newest" ["with-profile" "newest,1.5:newest,1.6:newest,1.7:newest,1.8" "test"]
+            "test-oldest" ["with-profile" "oldest,1.5:oldest,1.6:oldest,1.7:oldest,1.8" "test"]}
+  :profiles {:1.8 {:dependencies [[org.clojure/clojure "1.8.0"]]}
+             :1.7 {:dependencies [[org.clojure/clojure "1.7.0"]]}
              :1.6 {:dependencies [[org.clojure/clojure "1.6.0"]]}
              :1.5 {:dependencies [[org.clojure/clojure "1.5.1"]]}
              ;;the newest supported version of clj-http

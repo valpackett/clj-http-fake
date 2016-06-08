@@ -134,7 +134,8 @@
 (deftest get-request-contains-empty-query-params
   (is (= (with-fake-routes-in-isolation
            {#".*/foo/bar" (constantly {:status 200 :headers {} :body "that's my foo bar"})}
-           (:body (http/get "http://floatboth.com/achey/breaky/foo/bar" {:query-params {}}))))))
+           (:body (http/get "http://floatboth.com/achey/breaky/foo/bar" {:query-params {}})))
+         "that's my foo bar")))
 
 (deftest request-contains-query-params
   (is (= (with-fake-routes
@@ -189,7 +190,8 @@
              :query-params {:q "aardvark"}}
             (fn [request]
               {:status 200 :headers {} :body "anteater"})}
-           (:body (http/get "http://google.com/aab" {:query-params {:q "aardvark"}})))))
+           (:body (http/get "http://google.com/aab" {:query-params {:q "aardvark"}})))
+         "anteater"))
 
   (testing "with spaces in the query params"
     (is (= (with-fake-routes-in-isolation
@@ -212,3 +214,20 @@
                   (:body (http/get "http://google.com/aab"
                                    {:as :byte-array
                                     :query-params {:q "aardvark"}}))))))))
+
+(deftest response-map-default-fields
+  (testing "if no :body is given, the body is empty"
+    (is (= (with-fake-routes {"http://google.com/" (constantly {:status 200})}
+             (:body (http/get "http://google.com/")))
+           "")))
+
+  (testing "if no :status is given, the it is assumed to be 200"
+    (is (= (with-fake-routes {"http://google.com/" (constantly {:body "OK"})}
+             (:status (http/get "http://google.com/")))
+           200)))
+
+  (testing "defaults when both :status and :body are missing"
+    (let [response (with-fake-routes {"http://google.com/" (constantly {})}
+                     (http/get "http://google.com/"))]
+      (is (= (:status response) 200))
+      (is (= (:body response) "")))))
