@@ -16,7 +16,18 @@ In your namespace declaration:
   (:use clj-http.fake))
 ```
 
-### Basic operations:
+The public interface consists of macros:
+
+* ``with-fake-routes`` - lets you override clj-http requests that match keys in the provided map
+* ``with-fake-routes-in-isolation`` - does the same but throws if a request does not match any key
+* ``with-global-fake-routes``
+* ``with-global-fake-routes-in-isolation``
+
+'Global' counterparts use ``with-redefs`` instead of ``binding`` internally so they can be used in
+a multi-threaded environment.
+
+
+### Examples
 
 ```clojure
 (with-fake-routes {
@@ -42,21 +53,29 @@ In your namespace declaration:
 
   ;; Match using query params as a map
    {:address "http://google.com/search"
-    :query-params {:q "aardark"}} (fn [req] {:status 200 :headers {} :body "Searches have results"})
- }
+    :query-params {:q "aardark"}} (fn [req] {:status 200 :headers {} :body "Searches have results"})}
+
+   ;; If not given, the fake response status will be 200 and the body will be "".
+   "https://duckduckgo.com/?q=ponies" (constantly {})
+
  ;; Your tests with requests here
  )
 ```
 
 ## Development
 
-Use [Leiningen](http://leiningen.org) with profiles.
+Use [Leiningen](http://leiningen.org) **with profiles**. E.g.:
+
+```
+$ lein with-profile +latest-2.x,+1.8 repl
+```
 
 There are aliases to run the tests with the oldest and newest supported versions of clj-http:
 
 ```
-$ lein test-newest
-$ lein test-oldest
+$ lein test-3.x  # Testing under clj-http 3.x
+$ lein test-2.x  # Testing under clj-http 2.x
+$ lein test-oldest  # Testing under clj-http 0.7.8... Anyone still using that?
 ```
 
 ## License
