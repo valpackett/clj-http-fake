@@ -5,16 +5,18 @@
             :url  "http://www.opensource.org/licenses/mit-license.php"
             :distribution :repo}
   :min-lein-version "2.0.0"
-  :dependencies [[org.clojure/math.combinatorics "0.1.1"]
+  :dependencies [[org.clojure/math.combinatorics "0.1.3"]
                  [robert/hooke "1.3.0"]
-                 [clj-http "2.0.0"] ;; Needed here or lein might not compile clj-http first, resulting in broken builds
-                 [ring/ring-codec "1.0.0"]]
-  :aliases {"test-newest" ["with-profile" "newest,1.5:newest,1.6:newest,1.7:newest,1.8" "test"]
+                 [clj-http "3.1.0"] ;; Needed here or lein might not compile clj-http first, resulting in broken builds
+                 [ring/ring-codec "1.0.1"]]
+  :aliases {"test-2.x" ["with-profile" "latest-2.x,1.5:latest-2.x,1.6:latest-2.x,1.7:latest-2.x,1.8" "test"]
+            "test-3.x" ["with-profile" "latest-3.x,1.5:latest-3.x,1.6:latest-3.x,1.7:latest-3.x,1.8" "test"]
             "test-oldest" ["with-profile" "oldest,1.5:oldest,1.6:oldest,1.7:oldest,1.8" "test"]}
   :profiles {:1.8 {:dependencies [[org.clojure/clojure "1.8.0"]]}
              :1.7 {:dependencies [[org.clojure/clojure "1.7.0"]]}
              :1.6 {:dependencies [[org.clojure/clojure "1.6.0"]]}
              :1.5 {:dependencies [[org.clojure/clojure "1.5.1"]]}
-             ;;the newest supported version of clj-http
-             :newest {:dependencies [[clj-http "2.0.0"]]}
+             ;;the latest supported versions of clj-http from the 2.x and 3.x releases:
+             :latest-2.x {:dependencies [[clj-http "2.2.0"]]}
+             :latest-3.x {:dependencies [[clj-http "3.1.0"]]}
              :oldest {:dependencies [[clj-http "0.7.8"]]}})
