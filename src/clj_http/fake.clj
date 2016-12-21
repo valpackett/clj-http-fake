@@ -148,22 +148,25 @@
     (assoc request :body (.getContent (:body request)))
     request))
 
-(defn try-intercept [origfn request]
-  (if-let [matching-route
-           (first
-            (filter
-             #(matches (:address %) (:method %) request)
-             (flatten-routes *fake-routes*)))]
-    (let [route-handler (:handler matching-route)
-          response (merge {:status 200 :body ""}
-                          (route-handler (unwrap-body request)))]
-      (assoc response :body (body-bytes (:body response))))
-    (if *in-isolation*
-      (throw (Exception.
-              (apply format
-               "No matching fake route found to handle request. Request details: \n\t%s \n\t%s \n\t%s \n\t%s \n\t%s "
-               (select-keys request [:scheme :request-method :server-name :uri :query-string]))))
-      (origfn request))))
+(defn try-intercept
+  ([origfn request respond raise]
+   (origfn request respond raise))
+  ([origfn request]
+   (if-let [matching-route
+            (first
+             (filter
+              #(matches (:address %) (:method %) request)
+              (flatten-routes *fake-routes*)))]
+     (let [route-handler (:handler matching-route)
+           response (merge {:status 200 :body ""}
+                           (route-handler (unwrap-body request)))]
+       (assoc response :body (body-bytes (:body response))))
+     (if *in-isolation*
+       (throw (Exception.
+               (apply format
+                      "No matching fake route found to handle request. Request details: \n\t%s \n\t%s \n\t%s \n\t%s \n\t%s "
+                      (select-keys request [:scheme :request-method :server-name :uri :query-string]))))
+       (origfn request)))))
 
 (defn initialize-request-hook []
   (add-hook
