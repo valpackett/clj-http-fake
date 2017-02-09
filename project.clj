@@ -18,5 +18,5 @@
              :1.5 {:dependencies [[org.clojure/clojure "1.5.1"]]}
              ;;the latest supported versions of clj-http from the 2.x and 3.x releases:
              :latest-2.x {:dependencies [[clj-http "2.2.0"]]}
-             :latest-3.x {:dependencies [[clj-http "3.1.0"]]}
+             :latest-3.x {:dependencies [[clj-http "3.4.1"]]}
              :oldest {:dependencies [[clj-http "0.7.8"]]}})
