@@ -4,7 +4,8 @@
             [clj-http.util :as util])
   (:use [clj-http.fake]
         [clojure.test]
-        :reload-all))
+        :reload-all)
+  (:import (java.net ConnectException)))
 
 (deftest matches-route-exactly
   (is (= (with-fake-routes
@@ -231,3 +232,35 @@
                      (http/get "http://google.com/"))]
       (is (= (:status response) 200))
       (is (= (:body response) "")))))
+
+(deftest respond-and-raise
+  (let [body (.getBytes "OK")]
+    (with-fake-routes-in-isolation
+      {"http://google.com/"  (constantly {:body body})
+       "http://google2.com/" (fn [_]
+                               (throw (ConnectException.)))}
+
+      (testing "if there is no exception, respond is called"
+        (let [val (atom nil)]
+          (http/get "http://google.com/"
+                    {:as :byte-array :async? true}
+                    (partial reset! val)
+                    (partial reset! val))
+          (is (= (seq body) (seq (:body @val))))))
+
+      (testing "if there is an exception, raise is called"
+        (let [val (atom nil)]
+          (http/get "http://google2.com/"
+                    {:as :byte-array :async? true}
+                    (partial reset! val)
+                    (partial reset! val))
+          (is (instance? ConnectException @val))))
+
+      (testing "if route is unavailable, exception is thrown"
+        (let [val (atom nil)]
+          (is (thrown? Exception
+                       (http/get "http://somerandomhost.com/"
+                                 {:as :byte-array :async? true}
+                                 (partial reset! val)
+                                 (partial reset! val))))
+          (is (nil? @val)))))))
