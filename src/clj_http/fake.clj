@@ -148,24 +148,40 @@
     (assoc request :body (.getContent (:body request)))
     request))
 
+(defn- get-matching-route
+  [request]
+  (->> *fake-routes*
+       flatten-routes
+       (filter #(matches (:address %) (:method %) request))
+       first))
+
+(defn- handle-request-for-route
+  [request route]
+  (let [route-handler (:handler route)
+        response (merge {:status 200 :body ""}
+                        (route-handler (unwrap-body request)))]
+    (assoc response :body (body-bytes (:body response)))))
+
+(defn- throw-no-fake-route-exception
+  [request]
+  (throw (Exception.
+           (apply format
+                  "No matching fake route found to handle request. Request details: \n\t%s \n\t%s \n\t%s \n\t%s \n\t%s "
+                  (select-keys request [:scheme :request-method :server-name :uri :query-string])))))
+
 (defn try-intercept
   ([origfn request respond raise]
-   (origfn request respond raise))
-  ([origfn request]
-   (if-let [matching-route
-            (first
-             (filter
-              #(matches (:address %) (:method %) request)
-              (flatten-routes *fake-routes*)))]
-     (let [route-handler (:handler matching-route)
-           response (merge {:status 200 :body ""}
-                           (route-handler (unwrap-body request)))]
-       (assoc response :body (body-bytes (:body response))))
+   (if-let [matching-route (get-matching-route request)]
+     (try (respond (handle-request-for-route request matching-route))
+          (catch Exception e (raise e)))
      (if *in-isolation*
-       (throw (Exception.
-               (apply format
-                      "No matching fake route found to handle request. Request details: \n\t%s \n\t%s \n\t%s \n\t%s \n\t%s "
-                      (select-keys request [:scheme :request-method :server-name :uri :query-string]))))
+       (throw-no-fake-route-exception request)
+       (origfn request respond raise))))
+  ([origfn request]
+   (if-let [matching-route (get-matching-route request)]
+     (handle-request-for-route request matching-route)
+     (if *in-isolation*
+       (throw-no-fake-route-exception request)
        (origfn request)))))
 
 (defn initialize-request-hook []
