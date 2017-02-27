@@ -53,10 +53,10 @@ a multi-threaded environment.
 
   ;; Match using query params as a map
    {:address "http://google.com/search"
-    :query-params {:q "aardark"}} (fn [req] {:status 200 :headers {} :body "Searches have results"})}
+    :query-params {:q "aardark"}} (fn [req] {:status 200 :headers {} :body "Searches have results"})
 
    ;; If not given, the fake response status will be 200 and the body will be "".
-   "https://duckduckgo.com/?q=ponies" (constantly {})
+   "https://duckduckgo.com/?q=ponies" (constantly {})}
 
  ;; Your tests with requests here
  )
