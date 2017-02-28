@@ -1,14 +1,8 @@
-# clj-http-fake [![Build Status](https://img.shields.io/travis/myfreeweb/clj-http-fake.svg?style=flat)](https://travis-ci.org/myfreeweb/clj-http-fake) [![MIT License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat)](https://www.tldrlegal.com/l/mit)
+# clj-http-fake [![Build Status](https://img.shields.io/travis/myfreeweb/clj-http-fake.svg?style=flat)](https://travis-ci.org/myfreeweb/clj-http-fake) [![MIT License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat)](https://www.tldrlegal.com/l/mit) [![Clojars Project](https://img.shields.io/clojars/v/clj-http-fake.svg)](https://clojars.org/clj-http-fake)
 
 Basically, [fakeweb](https://github.com/chrisk/fakeweb) in Clojure, for [clj-http](https://github.com/dakrone/clj-http).
 
 ## Usage
-
-In your ```project.clj``` file:
-
-[![Clojars Project](http://clojars.org/clj-http-fake/latest-version.svg)](http://clojars.org/clj-http-fake)
-
-In your namespace declaration:
 
 ```clojure
 (ns myapp.test.core
@@ -64,7 +58,7 @@ a multi-threaded environment.
 
 ## Development
 
-Use [Leiningen](http://leiningen.org) **with profiles**. E.g.:
+Use [Leiningen](https://leiningen.org) **with profiles**. E.g.:
 
 ```
 $ lein with-profile +latest-2.x,+1.8 repl
@@ -82,4 +76,10 @@ $ lein test-oldest  # Testing under clj-http 0.7.8... Anyone still using that?
 
 Released under [the MIT License](http://www.opensource.org/licenses/mit-license.php).
 
-## [Contributors](https://github.com/myfreeweb/clj-http-fake/contributors)
+## Contributing
+
+Please feel free to submit pull requests!
+
+By participating in this project you agree to follow the [Contributor Code of Conduct](http://contributor-covenant.org/version/1/4/).
+
+[The list of contributors is available on GitHub](https://github.com/myfreeweb/clj-http-fake/graphs/contributors).

@@ -3,4 +3,3 @@ lein: lein2
 script:
   - lein2 test-3.x
   - lein2 test-2.x
-  - lein2 test-oldest
