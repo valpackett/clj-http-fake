@@ -61,7 +61,7 @@ a multi-threaded environment.
 Use [Leiningen](https://leiningen.org) **with profiles**. E.g.:
 
 ```
-$ lein with-profile +latest-2.x,+1.8 repl
+$ lein with-profile +latest-3.x,+1.8 repl
 ```
 
 There are aliases to run the tests with the oldest and newest supported versions of clj-http:
@@ -69,7 +69,6 @@ There are aliases to run the tests with the oldest and newest supported versions
 ```
 $ lein test-3.x  # Testing under clj-http 3.x
 $ lein test-2.x  # Testing under clj-http 2.x
-$ lein test-oldest  # Testing under clj-http 0.7.8... Anyone still using that?
 ```
 
 ## License

@@ -1,4 +1,4 @@
-(defproject clj-http-fake "1.0.3"
+(defproject clj-http-fake "1.0.4-SNAPSHOT"
   :description "Helper for faking clj-http requests in testing, like Ruby's fakeweb."
   :url "https://github.com/myfreeweb/clj-http-fake"
   :license {:name "MIT License"

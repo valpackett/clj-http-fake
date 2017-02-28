@@ -9,4 +9,5 @@ pom.xml
 .project
 .nrepl-port
 *.iml
+*.asc
 /.idea/
