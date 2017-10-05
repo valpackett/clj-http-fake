@@ -57,7 +57,7 @@
   (let [queries (defaults-or-value #{"" nil} (:query-string request-map))
         query-supplied (= (count queries) 1)]
     (if query-supplied
-      (vec (map (partial join "&") (permutations (split (first queries) #"&|;"))))
+      (map (partial join "&") (permutations (split (first queries) #"&|;")))
       queries)))
 
 (defn- potential-alternatives-to [request]
@@ -65,8 +65,11 @@
         server-ports  (potential-server-ports-for  request)
         uris          (potential-uris-for          request)
         query-strings (potential-query-strings-for request)
-        combinations  (cartesian-product schemes server-ports uris query-strings)]
-    (map #(merge request (zipmap [:scheme :server-port :uri :query-string] %)) combinations)))
+        ;;  cartesian-product will modulate right-most params before left-most params.
+        ;;  By putting larger collections near the left, we have a higher likelihood
+        ;;  of taking advantage of its laziness, and halting early
+        combinations  (cartesian-product query-strings schemes server-ports uris)]
+    (map #(merge request (zipmap [:query-string :scheme :server-port :uri] %)) combinations)))
 
 (defn- address-string-for [request-map]
   (let [{:keys [scheme server-name server-port uri query-string]} request-map]

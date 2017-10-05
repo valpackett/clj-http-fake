@@ -7,6 +7,20 @@
         :reload-all)
   (:import (java.net ConnectException)))
 
+
+(deftest many-qparams-performance-test
+  (let [num-qparams 10]
+    (is (= (with-fake-routes
+             {#"http://test/\?.*"
+              (fn [request]
+                {:status 200 :headers {} :body "29RQPV"})}
+             (:body (http/request
+                      {:url "http://test/"
+                       :query-params (zipmap (map str (range 0 num-qparams))
+                                             (range 0 num-qparams))
+                       :method :get})))
+           "29RQPV"))))
+
 (deftest matches-route-exactly
   (is (= (with-fake-routes
            {"http://floatboth.com:2020/path/resource.ext?key=value"
