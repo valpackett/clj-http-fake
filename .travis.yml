@@ -1,5 +1,5 @@
 language: clojure
-lein: lein2
+lein: lein
 script:
-  - lein2 test-3.x
-  - lein2 test-2.x
+  - lein test-3.x
+  - lein test-2.x
