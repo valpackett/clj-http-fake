@@ -148,7 +148,7 @@
 
 (defn- unwrap-body [request]
   (if (instance? HttpEntity (:body request))
-    (assoc request :body (.getContent (:body request)))
+    (assoc request :body (.getContent ^HttpEntity (:body request)))
     request))
 
 (defn- get-matching-route
@@ -168,6 +168,7 @@
 (defn- throw-no-fake-route-exception
   [request]
   (throw (Exception.
+           ^String
            (apply format
                   "No matching fake route found to handle request. Request details: \n\t%s \n\t%s \n\t%s \n\t%s \n\t%s "
                   (select-keys request [:scheme :request-method :server-name :uri :query-string])))))
