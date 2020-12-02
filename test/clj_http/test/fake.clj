@@ -216,7 +216,17 @@
                 {:status 200 :headers {} :body "anteater"})}
              (:body (http/get "http://google.com/search"
                               {:query-params {:q "this has spaces"}})))
-           "anteater"))))
+           "anteater")))
+
+  (testing "non-string query params specified as map"
+    (is (= (with-fake-routes-in-isolation
+             {{:address "http://google.com/blah"
+               :query-params {:a 1 :b true :c "c"}}
+              (fn [request]
+                {:status 200 :headers {} :body "Ya got me!"})}
+             (:body (http/get "http://google.com/blah"
+                              {:query-params {:a 1 :b true :c "c"}})))
+           "Ya got me!"))))
 
 (deftest get-as-byte-array
   (let [body (.getBytes "anteater")]
