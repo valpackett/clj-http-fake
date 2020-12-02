@@ -93,7 +93,7 @@
   (let [actual-query-params (or (some-> request :query-string ring-codec/form-decode) {})]
     (and (= (count expected-query-params) (count actual-query-params))
          (every? (fn [[k v]]
-                   (= (str v) (get actual-query-params (if (string? k) k (name k)))))
+                   (= (str v) (get actual-query-params (name k))))
                  expected-query-params))))
 
 (extend-protocol RouteMatcher
