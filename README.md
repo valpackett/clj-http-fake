@@ -20,37 +20,43 @@ The public interface consists of macros:
 'Global' counterparts use ``with-redefs`` instead of ``binding`` internally so they can be used in
 a multi-threaded environment.
 
-
 ### Examples
 
 ```clojure
-(with-fake-routes {
-  ;; Exact string match:
-  "http://google.com/apps" (fn [request] {:status 200 :headers {} :body "Hey, do I look like Google.com?"})
-  ;; matches (c/get "http://google.com/apps")
+(with-fake-routes
+  {;; Exact string match:
+   "http://google.com/apps"
+   (fn [request] {:status 200 :headers {} :body "Hey, do I look like Google.com?"})
+   ;; matches (c/get "http://google.com/apps")
 
-  ;; Exact string match with query params:
-  "http://google.com/?query=param" (fn [request] {:status 200 :headers {} :body "Nah, that can't be Google!"})
-  ;; matches (c/get "http://google.com/" {:query-params {:query "param"}})
+   ;; Exact string match with query params:
+   "http://google.com/?query=param"
+   (fn [request] {:status 200 :headers {} :body "Nah, that can't be Google!"})
+   ;; matches (c/get "http://google.com/" {:query-params {:query "param"}})
 
-  ;; Regexp match:
-  #"https://([a-z]+).unrelenting.technology" (fn [req] {:status 200 :headers {} :body "Hello world"})
-  ;; matches (c/get "https://labs.unrelenting.technology"), (c/get "https://server.unrelenting.technology") and so on, based on regexp.
+   ;; Regexp match:
+   #"https://([a-z]+).unrelenting.technology"
+   (fn [req] {:status 200 :headers {} :body "Hello world"})
+   ;; matches (c/get "https://labs.unrelenting.technology"), (c/get "https://server.unrelenting.technology")
+   ;; and so on, based on regexp.
 
   ;; Match based an HTTP method:
-  "http://shmoogle.com/" {:get (fn [req] {:status 200 :headers {} :body "What is Scmoogle anyways?"})}
-  ;; will match only (c/get "http://google.com/")
+   "http://shmoogle.com/"
+   {:get (fn [req] {:status 200 :headers {} :body "What is Scmoogle anyways?"})}
+   ;; will match only (c/get "http://google.com/")
 
-  ;; Match multiple HTTP methods:
-  "http://doogle.com/" {:get    (fn [req] {:status 200 :headers {} :body "Nah, that can't be Google!"})
-                        :delete (fn [req] {:status 401 :headers {} :body "Do you think you can delete me?!"})}
+   ;; Match multiple HTTP methods:
+   "http://doogle.com/"
+   {:get    (fn [req] {:status 200 :headers {} :body "Nah, that can't be Google!"})
+    :delete (fn [req] {:status 401 :headers {} :body "Do you think you can delete me?!"})}
 
-  ;; Match using query params as a map
-   {:address "http://google.com/search"
-    :query-params {:q "aardark"}} (fn [req] {:status 200 :headers {} :body "Searches have results"})
+   ;; Match using query params as a map
+   {:address "http://google.com/search" :query-params {:q "aardark"}}
+   (fn [req] {:status 200 :headers {} :body "Searches have results"})
 
    ;; If not given, the fake response status will be 200 and the body will be "".
-   "https://duckduckgo.com/?q=ponies" (constantly {})}
+   "https://duckduckgo.com/?q=ponies"
+   (constantly {})}
 
  ;; Your tests with requests here
  )
@@ -60,13 +66,13 @@ a multi-threaded environment.
 
 Use [Leiningen](https://leiningen.org) **with profiles**. E.g.:
 
-```
+```sh
 $ lein with-profile +latest-3.x,+1.8 repl
 ```
 
 There are aliases to run the tests with the oldest and newest supported versions of clj-http:
 
-```
+```sh
 $ lein test-3.x  # Testing under clj-http 3.x
 $ lein test-2.x  # Testing under clj-http 2.x
 ```
