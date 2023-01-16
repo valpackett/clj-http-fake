@@ -37,8 +37,9 @@ a multi-threaded environment.
    ;; Regexp match:
    #"https://([a-z]+).unrelenting.technology"
    (fn [req] {:status 200 :headers {} :body "Hello world"})
-   ;; matches (c/get "https://labs.unrelenting.technology"), (c/get "https://server.unrelenting.technology")
-   ;; and so on, based on regexp.
+   ;; matches (c/get "https://labs.unrelenting.technology"),
+   ;; (c/get "https://server.unrelenting.technology") and so on, based on
+   ;; regexp.
 
   ;; Match based an HTTP method:
    "http://shmoogle.com/"
