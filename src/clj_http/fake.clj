@@ -176,10 +176,15 @@
 (defn try-intercept
   ([origfn request respond raise]
    (if-let [matching-route (get-matching-route request)]
-     (try (respond (handle-request-for-route request matching-route))
-          (catch Exception e (raise e)))
+     (future
+       (try (respond (handle-request-for-route request matching-route))
+            (catch Exception e (raise e)))
+       nil)
      (if *in-isolation*
-       (throw-no-fake-route-exception request)
+       (try (throw-no-fake-route-exception request)
+            (catch Exception e
+              (raise e)
+              (throw e)))
        (origfn request respond raise))))
   ([origfn request]
    (if-let [matching-route (get-matching-route request)]

@@ -270,26 +270,32 @@
                                 (throw (ConnectException.)))}
 
        (testing "if there is no exception, respond is called"
-         (let [val (atom nil)]
-           (http/get "http://google.com/"
-                     {:as :byte-array :async? true}
-                     (partial reset! val)
-                     (partial reset! val))
-           (is (= (seq body) (seq (:body @val))))))
+         (let [val (atom [])]
+           (is (future? (http/get "http://google.com/"
+                                  {:as :byte-array :async? true}
+                                  (partial swap! val conj)
+                                  (partial swap! val conj))))
+           (is (= 1 (count @val)))
+           (is (= (seq body) (seq (:body (first @val)))))))
 
        (testing "if there is an exception, raise is called"
-         (let [val (atom nil)]
-           (http/get "http://google2.com/"
-                     {:as :byte-array :async? true}
-                     (partial reset! val)
-                     (partial reset! val))
-           (is (instance? ConnectException @val))))
+         (let [val (atom [])]
+           (is (future? (http/get "http://google2.com/"
+                                  {:as :byte-array :async? true}
+                                  (partial swap! val conj)
+                                  (partial swap! val conj))))
+           (is (= 1 (count @val)))
+           (is (instance? ConnectException (first @val)))))
 
        (testing "if route is unavailable, exception is thrown"
-         (let [val (atom nil)]
-           (is (thrown? Exception
-                        (http/get "http://somerandomhost.com/"
-                                  {:as :byte-array :async? true}
-                                  (partial reset! val)
-                                  (partial reset! val))))
-           (is (nil? @val))))))))
+         (let [val (atom [])]
+           (is (thrown-with-msg? Exception
+                                 #"(?is)No matching fake route .*"
+                                 (http/get "http://somerandomhost.com/"
+                                           {:as :byte-array :async? true}
+                                           (partial swap! val conj)
+                                           (partial swap! val conj))))
+           (is (= 1 (count @val)))
+           (is (instance? Exception (first @val)))
+           (is (re-matches #"(?is)No matching fake route .*"
+                           (.getMessage (first @val))))))))))
